@@ -258,7 +258,37 @@ st_bt.configure(command=new_game)
 
 
 ############################################## game algorithms ###################################################
+#+++++++ check if there's captured coins for specific move at any direction
+def check_captured(coins,r,c,iy,ix,is_black,is_move,index):
+    my_color = "black" if is_black else "white"
+    target_color = "black" if not is_black else "white"
+    change_coins=[]
+    y=r
+    x=c
+    while True:
+        if y < 0 or y > board_size -1 or x < 0 or x > board_size - 1: return []
+        x=x+ix
+        y=y+iy
+        if y < 0 or y > board_size -1 or x < 0 or x > board_size - 1: return []
+        coin = coins[y][x]
+        if  coin == target_color :
+          change_coins.append((y,x) if is_move or index else coin)
+        else : break
+    if coins[y][x] != my_color : return []
+    return change_coins
 
+#+++++++ check if it's valid move only if there's captured coins
+def valid_moves(coins,r,c,is_black,is_move=False,index=False):
+    all_captures=[]
+    if not(coins[r][c]=="black" or coins[r][c]=="white"):
+        for iy,ix in directions:
+            all_captures= all_captures + check_captured(coins,r,c,iy,ix,is_black,is_move,index)
+    if is_move:
+        coins[r][c]="black" if is_black else "white"
+        for row,col in all_captures:
+             coins[row][col]="black" if is_black else "white"
+    return coins if is_move else all_captures
+  
 #+++++++ get all possible move for a game state 
 def possible_moves(coins,is_black,order_value=False):
     all_moves=[]
