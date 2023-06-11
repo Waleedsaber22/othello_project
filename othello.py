@@ -258,6 +258,29 @@ st_bt.configure(command=new_game)
 
 
 ############################################## game algorithms ###################################################
+
+#+++++++ get all possible move for a game state 
+def possible_moves(coins,is_black,order_value=False):
+    all_moves=[]
+    count=0
+    for row in range(board_size):
+        for col in range(board_size):
+            if(valid_moves(coins,row,col,is_black)):
+                if order_value:
+                    score=0
+                    if count < 3:
+                        new_coins = valid_moves(copy.deepcopy(coins),row,col,is_black,True)
+                        score=eval_func(new_coins,is_black)
+                    all_moves.append(((row,col),score))
+                else:
+                    all_moves.append((row,col))
+                count = count + 1
+    if order_value:
+        all_moves=sorted(all_moves, key = lambda ele: ele[1], reverse = (order_value == "desc"))
+        all_moves=[ele[0] for ele in all_moves]
+    return all_moves
+
+
 #++++++++++++++++++ calculate evaluation function based on all heurstics mentioned
 def eval_func(coins,is_black):
     my_color = "black" if is_black else "white"
