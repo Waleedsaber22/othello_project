@@ -298,6 +298,24 @@ def eval_func(coins,is_black):
     cost=cost+((my_moves-your_moves)/ (my_moves+your_moves if (my_moves+your_moves) else 1))*abs(cost)*0.5
     return cost
 
+#++++++++ count coins for two players for a game state
+def count_coins(coins):
+    black_coins=0
+    white_coins=0
+    for row in range(board_size):
+        for col in range(board_size):
+            if coins[row][col]=="black":black_coins=black_coins+1
+            if coins[row][col]=="white":white_coins=white_coins+1
+    return (black_coins,white_coins)
+
+#+++++++++++ check if it's last move (leaf node)
+def end_move(coins, is_black):
+    for row in range(board_size):
+        for col in range(board_size):
+            if valid_moves(coins, row, col, is_black):
+                return False
+    return True
+  
 #+++++++++++++++++++++ minimax algoritm
 
 def min_max(coins, is_black, depth, maximizer,player=False):
