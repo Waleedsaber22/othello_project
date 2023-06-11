@@ -298,7 +298,30 @@ def eval_func(coins,is_black):
     cost=cost+((my_moves-your_moves)/ (my_moves+your_moves if (my_moves+your_moves) else 1))*abs(cost)*0.5
     return cost
 
+#+++++++++++++++++++++ minimax algoritm
 
+def min_max(coins, is_black, depth, maximizer,player=False):
+
+    if depth == 0 or end_move(coins,is_black) or restart:
+
+        return eval_func(coins, player)
+
+    pv = possible_moves(coins,is_black)
+
+    best_score = min_eval_coins if maximizer else max_eval_coins
+
+    for (row,col) in pv:
+
+            new_coins = valid_moves(copy.deepcopy(coins), row ,col, is_black,True)
+
+            score = min_max(new_coins,not is_black, depth - 1, not maximizer,player)
+
+            best_score =  max(best_score, score) if maximizer else min(best_score, score)
+
+    if not pv: return min_max(new_coins,not is_black, depth - 1, not maximizer,player)
+
+    return best_score
+  
 #++++++++++++++++++++++ apply all possible moves for a game state in ai algorithm then get scores 
 def best_move(alg=0,depth=4):
     max_score = min_eval_coins
