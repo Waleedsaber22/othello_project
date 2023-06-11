@@ -467,6 +467,112 @@ def best_move(alg=0,depth=4):
                     max_score = score
                     new_col = col; new_row = row
     return (new_row, new_col)
+  
+############## apply actual move in board from any player
+#++++++++++ AI player make move
+def AI_move():
+    global waiting
+    waiting=True
+    level=(black_level.get() if active_black else white_level.get()) if game_type=="c" else black_level.get()
+    # estimate of best move
+    (row,col)=best_move(0 if level == "easy" or level == "veasy" else 1,1 if level=="veasy" else 2  if level == "easy" 
+                        else 3 if level=="med" else 4 if level=="hard" else 5)
+    waiting=False
+    apply_move(row,col)
+    return
+#++++++++++ player make move
+def apply_move(row,col,cpass=False):
+    global active_black
+    global waiting
+    if not waiting and not restart:
+        my_color="black" if active_black else "white"
+        trans_coins = valid_moves(coins,row,col,active_black,False,True)
+        if (trans_coins or cpass):
+            if row != -1:
+                waiting=True
+                
+                pygame.mixer.music.load(os.path.join(dir_path,"accept.mp3"))
+                pygame.mixer.music.play()
+                while pygame.mixer.music.get_busy():
+                    for i in [0,1,0,1]:
+                        if not restart:
+                            board[row][col].configure(bg= "blue" if i else "orange")
+                            time.sleep(0.2)
+                        else: return
+                coins[row][col]=my_color
+                board[row][col].configure(state=["disabled"],bg=my_color,activebackground="gray")
+                target_color="black" if not active_black else "white"
+                for (row,col) in trans_coins:
+                    if coins[row][col]==target_color:
+                        board[row][col].configure(state=["disabled"],bg=my_color)
+                        coins[row][col] = my_color
+                for row in range(8):
+                    for col in range(8):
+                        if board[row][col]["bg"]=="blue":
+                            board[row][col].configure(bg="gray")
+
+                active_black=not active_black
+                if game_type =="p" or (game_type =="pc" and active_black) or (game_type =="cp" and not active_black):
+                    for (row,col) in possible_moves(coins,active_black):
+                        board[row][col].configure(bg="blue")
+        # +++++++++++++++++++++++++++++++ players turns +++++++++++++++++++++++
+                player_lb.configure(text= f"{player_name(active_black,game_type)} playing now ...",foreground="black" if active_black  else "white")
+                (black_count,white_count)=count_coins(coins)
+        # +++++++++++++++++++++++++++++++ players scores  +++++++++++++++++++++
+                score_lb.configure(text=f"⚫ {black_count}  ⚪ {white_count}")
+                waiting=False
+                if (not active_black and game_type == "pc") or (active_black and game_type=="cp") or game_type == "c":
+                    AI_move()
+                    return
+
+        elif row!=-1:
+            pygame.mixer.music.load(os.path.join(dir_path,"reject.wav"))
+            pygame.mixer.music.play()
+            board[row][col].configure(activebackground="red")
+        black_moves = possible_moves(coins,True)
+        white_moves = possible_moves(coins,False)
+        # +++++++++++++++++++++++++++++++  game over  +++++++++++++++++++++
+        if not black_moves and not white_moves:
+            (b,w)=count_coins(coins)
+            lb="Draw between Players" if b==w else f"{player_name(b>w,game_type)} Winner"
+            winner_lbl.configure(text=f"{lb}",foreground="black" if b>w  else "white")
+            gameover_fr_cont.grid(sticky="")
+            gameover_fr_cont.tkraise()
+            player_lb.configure(text= f"All players play their moves")
+            active_black=1
+        # +++++++++++++++++++++++++++++++  skip black turn  +++++++++++++++++++++
+        elif active_black and not black_moves:
+            active_black=not active_black
+            player_lb.configure(text= f"{player_name(active_black,game_type)} playing now ...",foreground="black" if active_black  else "white")
+            if game_type=="c" or game_type=="pc":
+                AI_move()
+            else:
+                for row in range(8):
+                    for col in range(8):
+                        if board[row][col]["bg"]=="blue":
+                            board[row][col].configure(bg="gray")
+                if game_type =="p" or (game_type =="pc" and active_black) or (game_type =="cp" and not active_black):
+                    for (row,col) in possible_moves(coins,active_black):
+                        board[row][col].configure(bg="blue")
+            return
+        # +++++++++++++++++++++++++++++++  skip white turn  +++++++++++++++++++++
+        elif not active_black and not white_moves:
+            active_black=not active_black
+            player_lb.configure(text= f"{player_name(active_black,game_type)} playing now ...",foreground="black" if active_black  else "white")
+            if game_type=="c" or game_type=="cp":
+                AI_move()
+            else:
+                for row in range(8):
+                    for col in range(8):
+                        if board[row][col]["bg"]=="blue":
+                            board[row][col].configure(bg="gray")
+                if game_type =="p" or (game_type =="pc" and active_black) or (game_type =="cp" and not active_black):
+                    for (row,col) in possible_moves(coins,active_black):
+                        board[row][col].configure(bg="blue")
+            return
+def handle_move(row,col,cpass=False):
+    Timer(0,apply_move,(row,col,cpass)).start()
+    
 
 
 ################################################ start game ##############################################
