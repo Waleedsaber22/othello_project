@@ -5,7 +5,7 @@ import pygame
 import copy
 from threading import Timer
 from datetime import datetime
-import os 
+import os
 pygame.mixer.init()
 root = Tk()
 root.configure()
@@ -198,7 +198,7 @@ def go_play(type) :
         player_lb.configure(text= f"{player_name(active_black,game_type)} playing now ...",foreground="black" if active_black  else "white" )
         frames["play"].tkraise()
     scoretitle_lb.configure(text= (
-            "⚫ Player A Vs ⚪ Player B") if type == "p" else "⚫ Computer A Vs ⚪ Player A" if type == "cp" 
+            "⚫ Player A Vs ⚪ Player B") if type == "p" else "⚫ Computer A Vs ⚪ Player A" if type == "cp"
             else "⚫ Player A Vs ⚪ Computer A" if type == "pc" else "⚫ Computer A Vs ⚪ Computer B" if type=="c" else "")
 play_fr.pack(expand=True,pady=10)
 
@@ -286,7 +286,7 @@ def eval_func(coins,is_black):
     my_color = "black" if is_black else "white"
     target_color = "black" if not is_black else "white"
     ##################### using heurstics ##################
-    
+
     #+++++++++++ mobility heurstic (potential mobility)
     pv1=potential_moves(coins,is_black)
     pv2=potential_moves(coins,not is_black)
@@ -338,7 +338,26 @@ def end_move(coins, is_black):
             if valid_moves(coins, row, col, is_black):
                 return False
     return True
-  
+
+#################### heuristics and evaulation function part ###############
+
+#++++++++++++++++ mobility heuristic using potential moves (for efficient computation)
+def potential_moves(coins,is_black):
+    all_moves=[]
+    target_color = "white" if is_black else "black"
+    for row in range(board_size):
+        for col in range(board_size):
+            if(coins[row][col]==target_color):
+                    for (r,c) in directions:
+                        r1=row+r
+                        c1=col+c
+                        r2=row-r
+                        c2=col-c
+                        if(r1 >= 0 and r1 < board_size and c1  > 0 and c1 < board_size
+                           and r2 >= 0 and r2 < board_size and c2  > 0 and c2 < board_size):
+                            if coins[r1][c1]=="gray" and coins[r2][c2]!="gray":
+                                all_moves.append((r1,c1))
+    return list(set(all_moves))
 #+++++++++++++++++++++ minimax algoritm
 
 def min_max(coins, is_black, depth, maximizer,player=False):
@@ -362,7 +381,7 @@ def min_max(coins, is_black, depth, maximizer,player=False):
     if not pv: return min_max(new_coins,not is_black, depth - 1, not maximizer,player)
 
     return best_score
-  
+
 #++++++++++++++++++++++ minimax algoritm with alpha_beta pruning
 def alpha_beta(coins, is_black, depth, maximizer,alpha,beta,player=False,id_alg=0,now=0):
     # handle iterative deepening time violate
@@ -386,12 +405,12 @@ def alpha_beta(coins, is_black, depth, maximizer,alpha,beta,player=False,id_alg=
                     break
             else: return None
     if not pv:
-        if score is not None: 
+        if score is not None:
             return alpha_beta(new_coins,not is_black, depth - 1,not maximizer, alpha, beta, player,id_alg,now)
         else: return None
-    return best_score 
-  
-#++++++++++++++++++++++ apply all possible moves for a game state in ai algorithm then get scores 
+    return best_score
+
+#++++++++++++++++++++++ apply all possible moves for a game state in ai algorithm then get scores
 def best_move(alg=0,depth=4):
     max_score = min_eval_coins
     new_col = -1; new_row = -1
