@@ -475,7 +475,7 @@ def AI_move():
     waiting=True
     level=(black_level.get() if active_black else white_level.get()) if game_type=="c" else black_level.get()
     # estimate of best move
-    (row,col)=best_move(0 if level == "easy" or level == "veasy" else 1,1 if level=="veasy" else 2  if level == "easy" 
+    (row,col)=best_move(0 if level == "easy" or level == "veasy" else 2 if level=="med" else 1,0 if level=="veasy" else 1  if level == "easy" 
                         else 3 if level=="med" else 4 if level=="hard" else 5)
     waiting=False
     apply_move(row,col)
