@@ -258,6 +258,20 @@ st_bt.configure(command=new_game)
 
 
 ############################################## game algorithms ###################################################
+#++++++++++++++++++ calculate evaluation function based on all heurstics mentioned
+def eval_func(coins,is_black):
+    my_color = "black" if is_black else "white"
+    target_color = "black" if not is_black else "white"
+    ##################### using heurstics ##################
+    
+    #+++++++++++ mobility heurstic (potential mobility)
+    pv1=potential_moves(coins,is_black)
+    pv2=potential_moves(coins,not is_black)
+    my_moves=len(pv1)
+    your_moves=len(pv2)
+    cost=0
+
+   
 
 
 ################################################ start game ##############################################
