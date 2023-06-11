@@ -271,7 +271,33 @@ def eval_func(coins,is_black):
     your_moves=len(pv2)
     cost=0
 
-   
+    #++++++++++++ static cost matrix taking into consideration high corner value
+    #++++++++++++and changing the cells adjacent to the same color corner accordingly
+    static_cost=[
+        [80,1,10,10,10,10,1,80],
+        [1,2,4,4,4,4,2,1],
+        [10,4,7,6,6,7,4,10],
+        [10,4,6,7,7,6,4,10],
+        [10,4,6,7,7,6,4,10],
+        [10,4,7,6,6,7,4,10],
+        [1,2,4,4,4,4,2,1],
+        [80,1,10,10,10,10,1,80]
+        ]
+    for row in range(board_size):
+        for col in range(board_size):
+            actual_color=coins[row][col]
+            if  actual_color == my_color or actual_color == target_color:
+                if regions[row][col]==80 and actual_color == my_color:
+                    r = 1 if (row==0) else row-1
+                    c = 1 if (col==0) else col-1
+                    if coins[r][col]==my_color:
+                        static_cost[r][col]=80
+                    if coins[row][c]==my_color:
+                        static_cost[row][c]=80
+                cost= cost +  (static_cost[row][col] if actual_color == my_color else -static_cost[row][col])
+    cost=cost+((my_moves-your_moves)/ (my_moves+your_moves if (my_moves+your_moves) else 1))*abs(cost)*0.5
+    return cost
+
 
 
 ################################################ start game ##############################################
