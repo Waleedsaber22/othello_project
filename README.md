@@ -38,7 +38,7 @@ Start AI: for the Ai to start a move in case of Computer vs Computer.
 at the end of the game a message board appears in the center of the screen announcing the winner , then the user has the option to choose from Restart and Start New Game.
 
 ## User Manual:
-when the user opens the game a home page appear,it contains 5 options for choosing the play mode.
+when the user opens the game a page with a start button appears, when the user selects the button a home page appear,it contains 4 options for choosing the play mode.
 
 after the user choose one another panel appears beside it having options for every AI based player in the upcoming game to choose the difficulty from 5 different levels.
 
