@@ -340,6 +340,34 @@ def min_max(coins, is_black, depth, maximizer,player=False):
 
     return best_score
   
+#++++++++++++++++++++++ minimax algoritm with alpha_beta pruning
+def alpha_beta(coins, is_black, depth, maximizer,alpha,beta,player=False,id_alg=0,now=0):
+    # handle iterative deepening time violate
+    if id_alg:
+        if (datetime.timestamp(datetime.now())-now) > 5:
+            return None
+    if depth == 0 or end_move(coins, is_black) or restart:
+        return eval_func(coins, player)
+    pv = possible_moves(coins,is_black)
+    best_score = min_eval_coins if maximizer else max_eval_coins
+    for (row,col) in pv:
+        if valid_moves(coins, row, col, is_black):
+            new_coins = valid_moves(copy.deepcopy(coins), row, col, is_black,True)
+            score = alpha_beta(new_coins,not is_black, depth - 1,not maximizer, alpha, beta, player,id_alg,now)
+            if score is not None:
+                best_score = max(score,best_score) if maximizer else min(score,best_score)
+                if maximizer :alpha = max(alpha, best_score)
+                else: beta = min(beta, best_score)
+                # pruning (cut-off)
+                if alpha >= beta:
+                    break
+            else: return None
+    if not pv:
+        if score is not None: 
+            return alpha_beta(new_coins,not is_black, depth - 1,not maximizer, alpha, beta, player,id_alg,now)
+        else: return None
+    return best_score 
+  
 #++++++++++++++++++++++ apply all possible moves for a game state in ai algorithm then get scores 
 def best_move(alg=0,depth=4):
     max_score = min_eval_coins
