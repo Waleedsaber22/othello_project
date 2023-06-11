@@ -299,6 +299,34 @@ def eval_func(coins,is_black):
     return cost
 
 
+#++++++++++++++++++++++ apply all possible moves for a game state in ai algorithm then get scores 
+def best_move(alg=0,depth=4):
+    max_score = min_eval_coins
+    new_col = -1; new_row = -1
+    idepth=1
+    now=datetime.timestamp(datetime.now())
+    for row,col in possible_moves(coins,active_black):
+            if valid_moves(coins, row, col, active_black) and not restart:
+                new_coins = valid_moves(copy.deepcopy(coins), row, col, active_black,True)
+                score=0
+                if alg==0:
+                    #minimax algorithm
+                    score = min_max(new_coins,not active_black, depth, False,active_black)
+                elif alg==1:
+                    #minimax algorithm with alpha_beta pruning
+                    score = alpha_beta(new_coins,not active_black, depth, False,min_eval_coins,max_eval_coins,active_black)
+                elif alg==2:
+                    #iterative deepning minimax algorithm with alpha_beta pruning
+                    while idepth <= depth and ((datetime.timestamp(datetime.now())-now) <= 5):
+                        val=alpha_beta(new_coins,not active_black,idepth, False,min_eval_coins,max_eval_coins,active_black,True,now)
+                        idepth = idepth + 1
+                        if val is not None:
+                            score=val
+                if score > max_score:
+                    max_score = score
+                    new_col = col; new_row = row
+    return (new_row, new_col)
+
 
 ################################################ start game ##############################################
 init_board()
